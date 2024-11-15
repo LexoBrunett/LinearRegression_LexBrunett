@@ -4,22 +4,22 @@ engine = db_connect()
 # your code here
 import pandas as pd
 
-health_data = pd.read_csv("https://raw.githubusercontent.com/4GeeksAcademy/linear-regression-project-tutorial/main/medical_insurance_cost.csv")
-health_data = health_data.drop_duplicates().reset_index(drop = True)
-health_data.head(20)
+total_data = pd.read_csv("https://raw.githubusercontent.com/4GeeksAcademy/linear-regression-project-tutorial/main/medical_insurance_cost.csv")
+total_data = total_data.drop_duplicates().reset_index(drop = True)
+total_data.head()
 
 # Min-Max scaler
 
 from sklearn.preprocessing import MinMaxScaler
 
-health_data["sex_n"] = pd.factorize(health_data["sex"])[0]
-health_data["smoker_n"] = pd.factorize(health_data["smoker"])[0]
-health_data["region_n"] = pd.factorize(health_data["region"])[0]
+total_data["sex_n"] = pd.factorize(total_data["sex"])[0]
+total_data["smoker_n"] = pd.factorize(total_data["smoker"])[0]
+total_data["region_n"] = pd.factorize(total_data["region"])[0]
 num_variables = ["age", "bmi", "children", "sex_n", "smoker_n", "region_n", "charges"]
 
 scaler = MinMaxScaler()
-scal_features = scaler.fit_transform(health_data[num_variables])
-total_data_scal = pd.DataFrame(scal_features, index = health_data.index, columns = num_variables)
+scal_features = scaler.fit_transform(total_data[num_variables])
+total_data_scal = pd.DataFrame(scal_features, index = total_data.index, columns = num_variables)
 total_data_scal.head()
 
 # Feature selection
@@ -39,8 +39,19 @@ selected_columns = X_train.columns[selection_model.get_support()]
 X_train_sel = pd.DataFrame(selection_model.transform(X_train), columns = selected_columns)
 X_test_sel = pd.DataFrame(selection_model.transform(X_test), columns = selected_columns)
 
-train_data = X_train_sel
-test_data = X_test_sel
+X_train_sel.head()
+
+X_test_sel.head()
+
+X_train_sel["charges"] = y_train.values
+X_test_sel["charges"] = y_test.values
+X_train_sel.to_csv("../data/processed/clean_train.csv", index = False)
+X_test_sel.to_csv("../data/processed/clean_test.csv", index = False)
+
+train_data = pd.read_csv("../data/processed/clean_train.csv")
+test_data = pd.read_csv("../data/processed/clean_test.csv")
+
+train_data.head()
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -83,3 +94,4 @@ from sklearn.metrics import mean_squared_error, r2_score
 
 print(f"MSE: {mean_squared_error(y_test, y_pred)}")
 print(f"R2 Score: {r2_score(y_test, y_pred)}")
+
